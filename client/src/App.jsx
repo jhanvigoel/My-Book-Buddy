@@ -7,6 +7,7 @@ import ReadingCalender from './pages/ReadingCalender'
 import Friends from './pages/Friends'
 import Events from './pages/Events'
 import NearbyBookstore from './pages/NearbyBookstore'
+import Books from './pages/Books'
 
 const App = () => {
   return (
@@ -18,6 +19,7 @@ const App = () => {
             <Route path = 'friends' element = {<Friends />} />
         </Route>
         <Route path = '/events' element = {<Events />} />
+        <Route path = '/books' element = {<Books />} />
         <Route path = '/nearby-bookstore' element = {<NearbyBookstore />} />
       </Routes>
     </div>
