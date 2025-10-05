@@ -8,6 +8,7 @@ import Friends from './pages/Friends'
 import Events from './pages/Events'
 import NearbyBookstore from './pages/NearbyBookstore'
 import Books from './pages/Books'
+import Map from './pages/Map'
 
 const App = () => {
   return (
@@ -21,6 +22,7 @@ const App = () => {
         <Route path = '/events' element = {<Events />} />
         <Route path = '/books' element = {<Books />} />
         <Route path = '/nearby-bookstore' element = {<NearbyBookstore />} />
+        <Route path = '/map' element = {<Map />} />
       </Routes>
     </div>
   )
