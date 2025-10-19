@@ -1,8 +1,12 @@
 import React from "react";
 import { Heart, ArrowRight, Menu } from "lucide-react";
 import LOGO from '../assets/LOGO.svg';
+import { useNavigate } from "react-router-dom";
 
 const Navbar = () => {
+
+  const navigate = useNavigate();
+
   return (
     <header className="fixed top-6 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-6xl px-8">
       <div className="bg-white rounded-full shadow-2xl border border-gray-100 px-12 py-6 flex items-center justify-between">
@@ -12,12 +16,12 @@ const Navbar = () => {
         </a>
         
         <div className="flex items-center gap-6">
-          <button className="text-lg rounded-full px-8 py-3 font-semibold border transition"
-            style={{ backgroundColor: '#8C87AA', color: 'white', borderColor: '#8C87AA' }}>
+          <button className="text-lg rounded-full px-8 py-3 font-semibold border transition hover:-translate-y-1"
+            style={{ backgroundColor: '#8C87AA', color: 'white', borderColor: '#8C87AA' }} onClick={() => navigate('/login')} >
             Sign In
           </button>
-          <button className="text-lg rounded-full px-8 py-3 font-semibold shadow-lg transition flex items-center"
-            style={{ backgroundColor: '#8C87AA', color: 'white', borderColor: '#8C87AA' }}>
+          <button className="text-lg rounded-full px-8 py-3 font-semibold shadow-lg transition flex items-center hover:-translate-y-1"
+            style={{ backgroundColor: '#8C87AA', color: 'white', borderColor: '#8C87AA' }} onClick = {() => navigate('/signup')}>
             Get Started for Free <ArrowRight className="ml-3 h-5 w-5" />
           </button>
         </div>

@@ -57,6 +57,12 @@ const Books = () => {
                         className="w-full h-full outline-none placeholder-gray-400 text-gray-700 bg-transparent text-base px-2"
                         value={search}
                         onChange={handleInputChange}
+                        onKeyPress = {(e) => {
+                            if (e.key === "Enter"){
+                                handleSearch();
+                                setUsed(true);
+                            }
+                        }}
                     />
                     <button
                         type="button"

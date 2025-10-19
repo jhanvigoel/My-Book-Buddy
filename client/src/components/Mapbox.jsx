@@ -1,18 +1,19 @@
 import React, { useEffect, useState} from 'react'
-import { MapContainer, TileLayer, Marker, Popup, useMapEvents, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
 function RecenterMap({ center }) {
-  const map = useMap();
-  useEffect(() => {
-    map.setView(center);
-  }, [center, map]);
-  return null;
+    const map = useMapEvents({});
+    useEffect(() => {
+        map.setView(center);
+    }, [center, map]);
+    return null;
 }
 
-function FetchBookStores({ setBookStores }) {
+function FetchBookStores({ setBookStores, center }) {
     const debounceRef = React.useRef();
+    
     const map = useMapEvents({
         moveend: () => {
             if (debounceRef.current) clearTimeout(debounceRef.current);
@@ -41,7 +42,8 @@ function FetchBookStores({ setBookStores }) {
                 id: element.id,
                 name: element.properties.name || "Unnamed Bookstore",
                 Lat: element.geometry.coordinates[1],
-                Lon: element.geometry.coordinates[0]
+                Lon: element.geometry.coordinates[0],
+                opening_hours: element.properties.opening_hours || "Not available",
             }));
             setBookStores(stores);
         } catch (err) {
@@ -50,15 +52,19 @@ function FetchBookStores({ setBookStores }) {
     }
 
     React.useEffect(() => {
-        fetchStores();
-    }, [map]);
-
-    // Cleanup debounce on unmount
-    React.useEffect(() => {
         return () => {
             if (debounceRef.current) clearTimeout(debounceRef.current);
         };
     }, []);
+
+     React.useEffect(() => {
+        if (map && center) {
+        const timeout = setTimeout(() => {
+            fetchStores();
+        }, 300);
+        return () => clearTimeout(timeout);
+        }
+    }, [map, JSON.stringify(center)]);
 
     return null;
 }
@@ -95,9 +101,8 @@ const Mapbox = () => {
   return (
     <div>
 
-        <MapContainer center={currLocation} zoom={14} style = {{height:"80vh",width :"80vw"}} className="border-4 black">
-        
-        <RecenterMap center= {currLocation} />
+    <MapContainer center={currLocation} zoom={14} style = {{height:"80vh",width :"65vw"}} className="border-4 black">
+    <RecenterMap center={currLocation} />
         <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -107,13 +112,13 @@ const Mapbox = () => {
             <Popup>Your currLocation </Popup>
          </Marker>
 
-        <FetchBookStores setBookStores = {setBookStores} />
+        <FetchBookStores setBookStores = {setBookStores} center={currLocation} />
                 
         {bookStores.map((store) => (
             <Marker key = {store.id || `${store.Lat},${store.Lon}`} position = {{lat: store.Lat, lng: store.Lon}} icon = {L.icon({
                 iconUrl: `https://api.geoapify.com/v2/icon?type=material&color=%23ff5722&size=64&apiKey=${import.meta.env.VITE_GEOAPIFY_API_KEY}`,iconSize: [45, 45]
             })}>
-            <Popup>{store.name}</Popup>
+            <Popup><p> Store Name : {store.name} </p> <p> Store Opening Hours : {store.opening_hours} </p></Popup>
             </Marker>
         ))}
 

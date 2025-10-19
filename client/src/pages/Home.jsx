@@ -3,6 +3,8 @@ import Navbar from '../components/Navbar'
 import Hero from '../components/Hero'
 import WeOffer from '../components/WeOffer'
 import Footer from '../components/Footer'
+import BookInfo from '../components/BookInfo'
+import MapInfo from '../components/MapInfo'
 
 const Home = () => {
   return (
@@ -10,6 +12,8 @@ const Home = () => {
         <Navbar />
         <Hero />
         <WeOffer />
+        <BookInfo />
+        <MapInfo />
         <Footer />
     </div>
   )
