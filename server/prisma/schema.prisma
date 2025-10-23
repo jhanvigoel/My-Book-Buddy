@@ -19,4 +19,46 @@ model User {
   email String @unique @db.VarChar(191)
   phone String @unique @db.VarChar(15)
   password String
+  
+  readingHistory ReadingHistory[]
+}
+
+model Book {
+
+  id Int @id @default(autoincrement())
+  title String
+  author String
+  coverUrl String?
+
+  readingHistories ReadingHistory[]
+
+  @@index([title])
+  @@index([author])
+
+}
+
+enum ReadStatus{
+  WANT_TO_READ
+  READING
+  COMPLETED
+}
+
+model ReadingHistory {
+
+  id Int @id @default(autoincrement())
+  userId Int 
+  bookId Int
+
+  user User @relation(fields:[userId],references: [id],onDelete: Cascade)
+  book Book @relation(fields:[bookId],references: [id],onDelete: Cascade)
+
+  status ReadStatus 
+  currentPage Int @default(0)
+
+  startedAt DateTime?
+  finishedAt DateTime?
+
+  @@unique([userId,bookId])
+  @@index([userId,status])
+
 }

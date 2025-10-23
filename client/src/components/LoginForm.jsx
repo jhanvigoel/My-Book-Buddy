@@ -38,7 +38,12 @@ const LoginForm = () => {
                 return;
             }
             else{
+                // Persist JWT token for authenticated requests
+                if (res.data?.token) {
+                    localStorage.setItem('token', res.data.token);
+                }
                 alert('login successful');
+                navigate('/dashboard');
             }
         }
         catch(err){

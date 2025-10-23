@@ -9,16 +9,16 @@ export const RegisterController = async(req,res) => {
         const {name,email,phone,password} = req.body;
 
         const user = await prisma.user.findFirst({
-            where : {
-                email : email,
-                phone : phone
+            where: {
+                OR: [
+                    { email: email },
+                    { phone: phone }
+                ]
             }
         })
 
         if (user){
-
-            return res.json({error: "User already exists"}).status(400);
-
+            return res.status(400).json({ error: "User already exists" });
         }
 
         const hashedPassword = await bcrypt.hash(password,10);
@@ -32,7 +32,8 @@ export const RegisterController = async(req,res) => {
             }
         })
 
-        return res.json(newUser).status(201);
+        const { password: _password, ...safeUser } = newUser;
+        return res.status(201).json(safeUser);
     }
     catch(err){
 
@@ -73,17 +74,16 @@ export const LoginController = async(req,res) => {
             id : user.id,
             email : user.email,
             name : user.name,
-            phone : user.phone,
-            password : user.password
+            phone : user.phone
         }
 
-        const token = jwt.sign(payload,process.env.JWT_SECRET);
+        const token = jwt.sign(payload, process.env.JWT_SECRET);
 
-        return res.json({message : "Login successful", token}).status(200);
+        return res.status(200).json({ message : "Login successful", token });
 
     }
     catch(err){
         console.log(err);
-        return res.json({error:err.message}).status(500);
+        return res.status(500).json({ error: err.message });
     }
 }

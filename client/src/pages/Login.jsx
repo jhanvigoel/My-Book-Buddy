@@ -7,7 +7,7 @@ const Login = () => {
     <div>
       <div className = "grid min-h-svh lg:grid-cols-2">
         <div className='flex flex-col gap-4 p-6 md:p-10'>
-          <div className='flex items-centerjustify-center gap-2 md:justify-start'>
+          <div className='flex items-center justify-center gap-2 md:justify-start'>
             <img src = {LOGO} alt = "Logo" className = "w-10 h-10"/>
             <span className="text-lg font-medium">My Book Buddy</span>
           </div>
