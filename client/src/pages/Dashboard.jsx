@@ -1,7 +1,23 @@
 import React from 'react'
 import LOGO from '../assets/LOGO.svg'
+import { useState } from 'react'
+import DashboardBook from '../components/DashboardBook';
 
 const Dashboard = () => {
+
+  const [bookName,setBookName] = useState('');
+
+  const [used,setUsed] = useState(false);
+
+  const [lastSearch,setLastSearch] = useState('');
+
+  const handleSearch = () => {
+
+    setUsed(true);
+    setLastSearch(bookName);
+
+  }
+
   return (
     <div>
 
@@ -16,10 +32,15 @@ const Dashboard = () => {
 
         <div className = "flex md:justify-start items-center gap-4">
 
-          <button className = "justify-right ml-auto px-6 py-3 rounded-full bg-[#8C87AA] font-bold text-white hover:bg-[#8C87AA]/80 hover:-translate-y-1 transition-transform">Reading History</button>
-          <button className = "justify-right px-6 py-3 rounded-full bg-[#8C87AA] font-bold text-white hover:bg-[#8C87AA]/80 hover:-translate-y-1 transition-transform">Profile</button>
+          <input className = "justify-right px-6 py-3 rounded-full bg-[#8C87AA] font-bold text-white hover:bg-[#8C87AA]/80 hover:-translate-y-1 transition-transform" 
+          type = 'text' placeholder='Search Books' value = {bookName}
+          onChange = {(e) => setBookName(e.target.value)}  onKeyPress={(e) => e.key === 'Enter' && handleSearch()}/>
+          <button className = "justify-right ml-auto px-6 py-3 rounded-full bg-[#8C87AA] font-bold text-white hover:bg-[#8C87AA]/80 hover:-translate-y-1 transition-transform">Profile</button>
         </div>
+
       </div>
+
+      {used && <DashboardBook bookName = {lastSearch} />}
     </div>
   )
 }

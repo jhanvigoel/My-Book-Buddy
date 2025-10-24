@@ -22,7 +22,7 @@ export const getReadingHistory = async (req,res) => {
                     }
                 }
             }
-        );
+        });
 
         const ReadingHistory = await prisma.readingHistory.findMany({
             where : { userId : parseInt(userId), status : 'READING' },
@@ -67,6 +67,64 @@ export const getReadingHistory = async (req,res) => {
         }
 
         return res.status(200).json({ history });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: error.message });
+    }
+}
+
+export const createReadingHistory = async (req,res) => {
+
+    try{
+
+        const userId = req.user.id; 
+        const {title,author,coverUrl,status} = req.body;
+
+        if (!title || !author){
+            return res.status(400).json({ error: "Title and Author are required" });
+        }
+
+        let book = await prisma.book.findFirst({
+            where : {
+                title : title,
+                author : author
+            }
+        });
+
+        if (!book){
+
+            book = await prisma.book.create({
+                data: {
+                    title : title,
+                    author : author,
+                    coverUrl : coverUrl
+                }
+            })
+        }
+
+        const existingHistory = await prisma.readingHistory.findFirst({
+            where: {
+                userId: userId,
+                bookId: book.id
+            }
+        });
+
+        if (existingHistory) {
+            return res.status(400).json({ error: "Reading history already exists for this book" });
+        }
+
+        const newReadingHistory = await prisma.readingHistory.create({
+            data: {
+                userId: userId,
+                bookId: book.id,
+                status: status,
+                startedAt: status === 'READING' ? new Date() : null,
+                finishedAt: status === 'COMPLETED' ? new Date() : null
+            }
+        });
+
+        return res.status(201).json({ message: "Book added successfully", readingHistory: newReadingHistory });
 
     } catch (error) {
         console.error(error);

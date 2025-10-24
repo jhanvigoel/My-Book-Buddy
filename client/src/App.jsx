@@ -13,6 +13,7 @@ import Signin from './pages/Signin'
 import Profile from './pages/Profile'
 import ProtectedRoute from './components/ProtectedRoute'
 import ReadingHistory from './pages/ReadingHistory'
+import BookPage from './pages/BookPage'
 
 const App = () => {
   return (
@@ -30,6 +31,7 @@ const App = () => {
         <Route path = '/signup' element = {<Signin />} />
         <Route path = '/profile' element = {<ProtectedRoute><Profile /></ProtectedRoute>} />
         <Route path = '/reading-history' element = {<ProtectedRoute><ReadingHistory /></ProtectedRoute>} />
+        <Route path = '/book/:bookId' element = {<BookPage />} />
       </Routes>
     </div>
   )

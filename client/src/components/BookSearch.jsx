@@ -1,13 +1,24 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
 
 
 const fallbackImage = "https://via.placeholder.com/128x192?text=No+Image";
 
 const BookSearch = ({ item }) => {
+  const navigate = useNavigate();
   const info = item.volumeInfo || {};
   const imageUrl = info.imageLinks?.smallThumbnail || fallbackImage;
+  
+  const handleClick = () => {
+
+    navigate(`/book/${item.id}`, { state: { book: item } });
+
+  };
+
   return (
-    <div className="bg-white rounded-3xl shadow-xl p-6 m-4 max-w-xs w-full flex flex-col hover:shadow-2xl hover:-translate-y-2 transition-transform border border-[#8C87AA]/20 text-left">
+    <div 
+      onClick={handleClick}
+      className="bg-white rounded-3xl shadow-xl p-6 m-4 max-w-xs w-full flex flex-col hover:shadow-2xl hover:-translate-y-2 transition-transform border border-[#8C87AA]/20 text-left cursor-pointer">
       <div className="flex-1 flex flex-col items-center">
         <img
           src={imageUrl}
@@ -23,6 +34,7 @@ const BookSearch = ({ item }) => {
             href={info.infoLink}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()} 
             className="inline-block bg-[#8C87AA] text-white text-xs px-4 py-2 rounded-full font-medium shadow hover:bg-[#6c6699] transition"
           >
             Checkout the Main Website
