@@ -12,7 +12,19 @@ const DashboardBook = ({bookName}) => {
 
         try{
 
-            const res = await axios.get(`${import.meta.env.VITE_BASE_URL}/dashboard?q=${encodeURIComponent(bookName)}`);
+            const token = localStorage.getItem('token');
+
+            if (!token) {
+                console.error('No token found');
+                return;
+            }
+
+            const res = await axios.get(`${import.meta.env.VITE_BASE_URL}/dashboard/book-search`, {
+                params: { q: bookName },
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
             setBooks(res.data);
 
         }catch(err){

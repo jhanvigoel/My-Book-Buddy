@@ -11,7 +11,7 @@ const BookSearch = ({ item }) => {
   
   const handleClick = () => {
 
-    navigate(`/book/${item.id}`, { state: { book: item } });
+    navigate(`/dashboard/book/${item.id}`, { state: { book: item } });
 
   };
 

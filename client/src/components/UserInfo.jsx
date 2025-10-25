@@ -17,7 +17,7 @@ const UserInfo = () => {
                 return;
             }
 
-            const res = await axios.get(`${import.meta.env.VITE_BASE_URL}/profile`,{
+            const res = await axios.get(`${import.meta.env.VITE_BASE_URL}/dashboard/profile`,{
                 headers:{
                     Authorization: `Bearer ${token}`
                 }

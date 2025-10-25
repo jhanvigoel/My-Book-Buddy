@@ -6,9 +6,9 @@ import { fetchbooks } from '../controllers/books.js';
 
 const Userrouter = express.Router();
 
-Userrouter.get('/profile', authMiddleware, getUserProfile);
-Userrouter.get('/reading-history', authMiddleware,getReadingHistory);
-Userrouter.get('/dashboard',fetchbooks);
-Userrouter.post('/reading-history',authMiddleware,createReadingHistory)
+Userrouter.get('/dashboard/profile', authMiddleware, getUserProfile);
+Userrouter.get('/dashboard', authMiddleware,getReadingHistory);
+Userrouter.get('/dashboard/book-search',authMiddleware,fetchbooks);
+Userrouter.post('/dashboard',authMiddleware,createReadingHistory)
 
 export default Userrouter;

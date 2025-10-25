@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import BookDisplay from '../components/BookDisplay'
 
-const ReadingHistory = () => {
+const History = () => {
 
     const [history,setHistory] = useState({
         WANT_TO_READ: [],
@@ -22,7 +22,7 @@ const ReadingHistory = () => {
                 return;
             }
 
-            const res = await axios.get(`${import.meta.env.VITE_BASE_URL}/reading-history`,{
+            const res = await axios.get(`${import.meta.env.VITE_BASE_URL}/dashboard`,{
                 headers:{
                     Authorization: `Bearer ${token}`
                 }
@@ -95,4 +95,4 @@ const ReadingHistory = () => {
   )
 }
 
-export default ReadingHistory
+export default History

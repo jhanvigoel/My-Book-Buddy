@@ -23,7 +23,7 @@ const BookPage = () => {
             status: status
         }
 
-        const res = await axios.post(`${import.meta.env.VITE_BASE_URL}/reading-history`,payload,{
+        const res = await axios.post(`${import.meta.env.VITE_BASE_URL}/dashboard`,payload,{
             headers:{
                 Authorization: `Bearer ${token}`
             }
