@@ -37,8 +37,26 @@ const History = () => {
 
     }
 
+    // Friends activity state
+    const [friendsActivity, setFriendsActivity] = useState({ items: [], total: 0, page: 1, pageSize: 10 });
+
+    const fetchFriendsActivity = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) return;
+            const res = await axios.get(`${import.meta.env.VITE_BASE_URL}/dashboard/friends/activity`, {
+                headers: { Authorization: `Bearer ${token}` },
+                params: { status: 'READING,COMPLETED', page: 1, pageSize: 9 }
+            });
+            setFriendsActivity(res.data);
+        } catch (e) {
+            console.error('friends activity error:', e);
+        }
+    };
+
     useEffect(() => {
         fetchReadingHistory();
+        fetchFriendsActivity();
     }, [])
 
   return (
@@ -54,10 +72,27 @@ const History = () => {
 
                 {history.WANT_TO_READ.length === 0 && <div className='text-xl'>No books in this category</div>}
 
-                {history.WANT_TO_READ.length > 0 && history.WANT_TO_READ.map((book) => {
+                <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+                    {history.WANT_TO_READ.length > 0 && history.WANT_TO_READ.map((book) => {
                     return <BookDisplay book = {book.book} key = {book.id} />
                 })}
 
+                </div>
+
+            </div>
+
+            <div className = "grid grid-cols-1 gap-6 mt-16">
+                <div className = "text-3xl font-semibold mb-4">Friends Activity</div>
+                {friendsActivity.items.length === 0 && (
+                    <div className='text-xl'>No recent activity from friends</div>
+                )}
+                {friendsActivity.items.length > 0 && (
+                    <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+                        {friendsActivity.items.map((item) => {
+                            return <BookDisplay book={item.book} key={item.id} />
+                        })}
+                    </div>
+                )}
             </div>
 
             <div className = "grid grid-cols-1 gap-6 mt-10">
@@ -66,9 +101,13 @@ const History = () => {
 
                 {history.READING.length === 0 && <div className='text-xl'>No books in this category</div>}
 
+                <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+
                 {history.READING.length > 0 && history.READING.map((book) => {
                     return <BookDisplay book = {book.book} key = {book.id} />
                 })}
+
+                </div>
                 
             </div>
 
@@ -77,6 +116,8 @@ const History = () => {
                 <div className = "text-3xl font-semibold mb-4">COMPLETED</div>
 
                 {history.COMPLETED.length === 0 && <div className='text-xl'>No books in this category</div>}
+
+                <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
 
                 {history.COMPLETED.length > 0 && history.COMPLETED.map((book) => {
                     return (
@@ -89,6 +130,8 @@ const History = () => {
                         </div>
                     )
                 })}
+
+                </div>
             </div>
         </div>
     </div>

@@ -18,7 +18,9 @@ export const getReadingHistory = async (req,res) => {
                         id: true,
                         title: true,
                         author: true,
-                        coverUrl: true
+                        coverUrl: true,
+                        googleVolumeId: true,
+                        infoLink: true
                     }
                 }
             }
@@ -36,7 +38,9 @@ export const getReadingHistory = async (req,res) => {
                         id: true,
                         title: true,
                         author: true,
-                        coverUrl: true
+                        coverUrl: true,
+                        googleVolumeId: true,
+                        infoLink: true
                     }
                 }
             }
@@ -54,7 +58,9 @@ export const getReadingHistory = async (req,res) => {
                         id: true,
                         title: true,
                         author: true,
-                        coverUrl: true
+                        coverUrl: true,
+                        googleVolumeId: true,
+                        infoLink: true
                     }
                 }
             }
@@ -79,26 +85,42 @@ export const createReadingHistory = async (req,res) => {
     try{
 
         const userId = req.user.id; 
-        const {title,author,coverUrl,status} = req.body;
+        const { title, author, coverUrl, status, googleVolumeId, infoLink } = req.body;
 
-        if (!title || !author){
+        if (!status){
+            return res.status(400).json({ error: "Status is required" });
+        }
+
+        if (!title || !author) {
             return res.status(400).json({ error: "Title and Author are required" });
         }
 
-        let book = await prisma.book.findFirst({
-            where : {
-                title : title,
-                author : author
-            }
-        });
+        let book = null;
+
+        if (googleVolumeId) {
+            book = await prisma.book.findUnique({
+                where: { googleVolumeId }
+            });
+        }
+
+        if (!book) {
+            book = await prisma.book.findFirst({
+                where: {
+                    title: title,
+                    author: author
+                }
+            });
+        }
 
         if (!book){
 
             book = await prisma.book.create({
                 data: {
-                    title : title,
-                    author : author,
-                    coverUrl : coverUrl
+                    title: title,
+                    author: author,
+                    coverUrl: coverUrl,
+                    googleVolumeId: googleVolumeId || null,
+                    infoLink: infoLink || null,
                 }
             })
         }
