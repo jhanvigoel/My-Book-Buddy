@@ -104,8 +104,8 @@ const FriendInfo = () => {
     const getFrom = (item) => item?.fromUser || item?.friend1 || item?.user1 || null;
     const getTo = (item) => item?.toUser || item?.friend2 || item?.user2 || null;
     const pickFriend = (item) => {
-        const u1 = item?.user1 || item?.friend1 || item?.fromUser;
-        const u2 = item?.user2 || item?.friend2 || item?.toUser;
+        const u1 = item?.friend1 || item?.fromUser;
+        const u2 = item?.friend2 || item?.toUser;
         if (!u1 && !u2) return item?.user || null;
         if (!myId) return u1 || u2;
         if (u1?.id === myId) return u2;

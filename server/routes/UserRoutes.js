@@ -10,7 +10,7 @@ const Userrouter = express.Router();
 Userrouter.get('/dashboard/profile', authMiddleware, getUserProfile);
 Userrouter.get('/dashboard', authMiddleware,getReadingHistory);
 Userrouter.get('/dashboard/book-search',authMiddleware,fetchbooks);
-Userrouter.post('/dashboard',authMiddleware,createReadingHistory)
+Userrouter.post('/dashboard/book/:bookId',authMiddleware,createReadingHistory)
 
 // Friends endpoints
 Userrouter.get('/dashboard/friends/search', authMiddleware, searchPeople);

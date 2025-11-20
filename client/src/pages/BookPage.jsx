@@ -1,22 +1,20 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
 import { useParams, useLocation } from 'react-router-dom'
 import axios from 'axios';
+import DOMPurify from 'dompurify';
 
 const BookPage = () => {
     const { bookId } = useParams();
     const location = useLocation();
     const passedBook = location.state?.book;
     const [info, setInfo] = useState(() => passedBook?.volumeInfo || null);
+    const [cover,setCover] = useState(passedBook?.coverUrl || '');
     const [loading, setLoading] = useState(!passedBook?.volumeInfo);
     const [error, setError] = useState('');
 
     useEffect(() => {
         const fetchById = async () => {
             if (info || !bookId) return;
-            if (/^\d+$/.test(bookId)) {
-                // Likely a DB numeric id, not a Google volume id; skip external fetch
-                return;
-            }
             try {
                 setLoading(true);
                 setError('');
@@ -42,13 +40,13 @@ const BookPage = () => {
         const payload = {
             title: info?.title,
             author: info?.authors?.join(',') || undefined,
-            coverUrl: info?.imageLinks?.thumbnail,
-            googleVolumeId: passedBook?.id || bookId,
+            coverUrl: info?.imageLinks?.thumbnail || '',
+            googleVolumeId: info?.googleVolumeId || bookId,
             infoLink: info?.infoLink,
             status
         };
 
-        const res = await axios.post(`${import.meta.env.VITE_BASE_URL}/dashboard`,payload,{
+        const res = await axios.post(`${import.meta.env.VITE_BASE_URL}/dashboard/book/${bookId}`,payload,{
             headers:{
                 Authorization: `Bearer ${token}`
             }
@@ -70,19 +68,13 @@ const BookPage = () => {
             v = v.replace('://books.google.com/books/content', '://books.googleusercontent.com/books/content');
             return v;
         };
-        const placeholderSvg = `data:image/svg+xml;utf8,${encodeURIComponent(`
-            <svg xmlns='http://www.w3.org/2000/svg' width='256' height='384'>
-                <rect width='100%' height='100%' fill='#e5e7eb'/>
-                <text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='#6b7280' font-family='Arial' font-size='18'>No Cover</text>
-            </svg>
-        `)}`;
+        
         const imageUrl = normalizeGoogleCover(
             info?.imageLinks?.large ||
             info?.imageLinks?.medium ||
             info?.imageLinks?.small ||
             info?.imageLinks?.thumbnail ||
-            info?.imageLinks?.smallThumbnail ||
-            ''
+            info?.imageLinks?.smallThumbnail || '' 
         );
 
   return (
@@ -96,7 +88,7 @@ const BookPage = () => {
                 
                 <div className="flex-shrink-0">
                     <img 
-                        src={imageUrl || placeholderSvg} 
+                        src={imageUrl === '' ? cover : imageUrl} 
                         alt={info?.title || 'Book cover'}
                         className="w-64 h-96 object-cover rounded-lg shadow-lg mx-auto md:mx-0"
                         referrerPolicy="no-referrer"
@@ -117,10 +109,7 @@ const BookPage = () => {
                         <span className="font-semibold">Publisher:</span> {info?.publisher || 'N/A'}
                     </div>
 
-                    <div className="mt-4 text-base text-gray-700 leading-relaxed">
-                        <span className="font-semibold text-lg">Description:</span>
-                        <p className="mt-2">{info?.description || 'No description available.'}</p>
-                    </div>
+                    <DescriptionBlock raw={info?.description} />
 
                     <div className="mt-8 flex flex-col gap-4 md:flex-row md:gap-4">
                         <button className="px-6 py-3 rounded-full bg-[#8C87AA] font-bold text-white hover:bg-[#8C87AA]/80 hover:-translate-y-1 transition-transform"
@@ -145,5 +134,23 @@ const BookPage = () => {
     </div>
   )
 }
+
+
+const allowedTags = ['p','b','i','em','strong','br','ul','ol','li'];
+const DescriptionBlock = ({ raw }) => {
+    const safeHtml = useMemo(() => {
+        if (!raw) return '<p>No description available.</p>';
+        
+        return DOMPurify.sanitize(raw, { ALLOWED_TAGS: allowedTags, ALLOWED_ATTR: [] });
+    }, [raw]);
+
+    
+    return (
+        <div className="mt-4 text-base text-gray-700 leading-relaxed">
+            <span className="font-semibold text-lg">Description:</span>
+            <div className="mt-2 space-y-3" dangerouslySetInnerHTML={{ __html: safeHtml }} />
+        </div>
+    );
+};
 
 export default BookPage

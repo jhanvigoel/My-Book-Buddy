@@ -1,7 +1,8 @@
 import prisma from '../Models/db.js';
 
-// GET /friends/search?query=...&page=1&pageSize=20
+
 export async function searchPeople(req, res) {
+
   try {
     const me = Number(req.user.id);
     const q = (req.query.query || '').trim();
@@ -27,12 +28,12 @@ export async function searchPeople(req, res) {
           name: true,
           email: true,
           phone: true,
-          friendshipsInitiated: {
+          friendshipsInitiated: { //second people have initiated friendship with us
             where: { friend2Id: me },
             select: { id: true, status: true, friend1Id: true, friend2Id: true },
             take: 1,
           },
-          friendshipsReceived: {
+          friendshipsReceived: { //people whom we have initiated friendship with
             where: { friend1Id: me },
             select: { id: true, status: true, friend1Id: true, friend2Id: true },
             take: 1,
@@ -235,6 +236,7 @@ export const FriendRequests = async (req,res) => {
         friendshipRecieved : recieved,
         friendshipInitiated : initiated,
         friendsList : friends,
+        myId : me,
       }
 
       return res.json(payload);
@@ -282,7 +284,7 @@ export async function friendsActivity(req, res) {
         where,
         include: {
           user: { select: { id: true, name: true } },
-          book: { select: { id: true, title: true, author: true, coverUrl: true } },
+          book: { select: { id: true, title: true, author: true, coverUrl: true , googleVolumeId: true, infoLink: true} },
         },
         orderBy: [
           { finishedAt: 'desc' },
