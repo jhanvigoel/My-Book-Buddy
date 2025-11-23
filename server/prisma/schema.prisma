@@ -25,6 +25,7 @@ model User {
 
   friendshipsInitiated Friends[] @relation("Friends_friend1")
   friendshipsReceived Friends[] @relation("Friends_friend2")
+  refrehTokens RefreshToken[]
 
   @@index([name])
 
@@ -94,4 +95,21 @@ model Friends {
   @@unique([friend1Id,friend2Id])
   @@index([friend2Id,status])
   @@index([friend1Id,status])
+}
+
+model RefreshToken{
+
+  id Int @id @default(autoincrement())
+  userId Int
+  tokenHash String @unique
+  createdAt DateTime @default(now())
+  expiresAt DateTime 
+  revokedAt DateTime?
+  replacedById Int?
+
+  user User @relation(fields:[userId], references:[id], onDelete: Cascade)
+  replacedBy RefreshToken? @relation("TokenReplacement",fields:[replacedById], references:[id])
+
+  @@index([userId,revokedAt])
+  @@index([expiresAt])
 }

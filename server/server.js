@@ -4,6 +4,7 @@ import 'dotenv/config'
 import nonUserRouter from './routes/NonUserRoutes.js';
 import router from './routes/AuthRoutes.js';
 import Userrouter from './routes/UserRoutes.js';
+import cookieParser from 'cookie-parser';
 
 import './Models/db.js';
 
@@ -11,6 +12,7 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.use(cookieParser());
 
 app.use('/',nonUserRouter);
 app.use('/',router);

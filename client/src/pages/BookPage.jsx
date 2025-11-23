@@ -40,7 +40,7 @@ const BookPage = () => {
         const payload = {
             title: info?.title,
             author: info?.authors?.join(',') || undefined,
-            coverUrl: info?.imageLinks?.thumbnail || '',
+            coverUrl: passedBook?.coverUrl || info?.imageLinks?.thumbnail || '',
             googleVolumeId: info?.googleVolumeId || bookId,
             infoLink: info?.infoLink,
             status
@@ -70,6 +70,7 @@ const BookPage = () => {
         };
         
         const imageUrl = normalizeGoogleCover(
+            cover ||
             info?.imageLinks?.large ||
             info?.imageLinks?.medium ||
             info?.imageLinks?.small ||
