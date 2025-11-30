@@ -1,9 +1,9 @@
 import React from 'react'
-import axios from 'axios';
+import { axiosPublic } from '../api/axios';
 import EventSearch from '../components/EventSearch';
 import { useState,useEffect } from 'react';
 
-axios.defaults.baseURL = import.meta.env.VITE_BASE_URL;
+// Base URL handled by axiosPublic instance
 
 const Events = () => {
 
@@ -15,7 +15,7 @@ const Events = () => {
 
         try{
 
-            const res = await axios.get('/events');
+            const res = await axiosPublic.get('/events');
             setEvents(res.data);
 
         }

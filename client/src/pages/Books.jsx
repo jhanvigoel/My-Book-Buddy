@@ -1,4 +1,4 @@
-import axios from 'axios';
+import { axiosPublic } from '../api/axios';
 import React from 'react'
 import { useEffect } from 'react';
 import { useState } from 'react'
@@ -20,7 +20,7 @@ const Books = () => {
 
         try{
 
-            const response = await axios.get('/books');
+            const response = await axiosPublic.get('/books');
             setBooks(response.data);
         } catch (error) {
             console.error("Error fetching books:", error);
@@ -31,7 +31,7 @@ const Books = () => {
 
         try{
 
-            const response = await axios.get(`/books?q=${encodeURIComponent(search)}`);
+            const response = await axiosPublic.get(`/books`, { params: { q: search } });
             setLastSearch(search);
             setBooks(response.data);
         } catch (error) {

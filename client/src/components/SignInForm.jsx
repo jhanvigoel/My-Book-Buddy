@@ -1,6 +1,6 @@
 import {React,useState} from 'react'
 import { useNavigate } from 'react-router-dom'
-import axios from 'axios';
+import { axiosPublic } from '../api/axios';
 import { Trophy } from 'lucide-react';
 
 const SignInForm = () => {
@@ -37,7 +37,7 @@ const SignInForm = () => {
         }
 
         try{
-            const res = await axios.post(`${import.meta.env.VITE_BASE_URL}/signup`,payload);
+            const res = await axiosPublic.post('/signup',payload);
 
             if (res.data?.error){
                 alert(res.data.error);

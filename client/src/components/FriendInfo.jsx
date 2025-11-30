@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import { axiosPrivate } from '../api/axios';
 
 const FriendInfo = () => {
 
@@ -11,17 +11,7 @@ const FriendInfo = () => {
         try {
             setLoading(true);
             setError('');
-            const token = localStorage.getItem('token');
-            if (!token) {
-                throw new Error('Missing auth token');
-            }
-            const base = (import.meta.env.VITE_BASE_URL || '').replace(/\/+$/, '');
-            if (!base) {
-                throw new Error('VITE_BASE_URL not configured');
-            }
-            const response = await axios.get(`${base}/dashboard/friends`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const response = await axiosPrivate.get('/dashboard/friends');
             setInfo(response.data);
         } catch (err) {
             console.error('fetchInfo error:', err);
@@ -38,44 +28,23 @@ const FriendInfo = () => {
 
     const actions = {
         async add(userId) {
-            const token = localStorage.getItem('token');
-            if (!token) return;
-            await axios.post(`${import.meta.env.VITE_BASE_URL}/dashboard/friends/request`, { toUserId: userId }, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            await axiosPrivate.post('/dashboard/friends/request', { toUserId: userId });
             await fetchInfo();
         },
         async accept(friendshipId) {
-            const token = localStorage.getItem('token');
-            if (!token) return;
-            await axios.post(`${import.meta.env.VITE_BASE_URL}/dashboard/friends/respond`, { friendshipId, action: 'ACCEPT' }, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            await axiosPrivate.post('/dashboard/friends/respond', { friendshipId, action: 'ACCEPT' });
             await fetchInfo();
         },
         async decline(friendshipId) {
-            const token = localStorage.getItem('token');
-            if (!token) return;
-            // Server expects 'DENY'
-            await axios.post(`${import.meta.env.VITE_BASE_URL}/dashboard/friends/respond`, { friendshipId, action: 'DENY' }, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            await axiosPrivate.post('/dashboard/friends/respond', { friendshipId, action: 'DENY' });
             await fetchInfo();
         },
         async cancel(friendshipId) {
-            const token = localStorage.getItem('token');
-            if (!token) return;
-            await axios.post(`${import.meta.env.VITE_BASE_URL}/dashboard/friends/cancel`, { friendshipId }, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            await axiosPrivate.post('/dashboard/friends/cancel', { friendshipId });
             await fetchInfo();
         },
         async unfriend(friendshipId) {
-            const token = localStorage.getItem('token');
-            if (!token) return;
-            await axios.delete(`${import.meta.env.VITE_BASE_URL}/dashboard/friends/${friendshipId}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            await axiosPrivate.delete(`/dashboard/friends/${friendshipId}`);
             await fetchInfo();
         }
     };

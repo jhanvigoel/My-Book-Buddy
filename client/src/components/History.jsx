@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import axios from 'axios'
+import { axiosPrivate } from '../api/axios'
 import BookDisplay from '../components/BookDisplay'
 
 const History = () => {
@@ -11,30 +11,12 @@ const History = () => {
     })
 
     const fetchReadingHistory = async () => {
-
-        try{
-
-            const token = localStorage.getItem('token');
-
-            if (!token){
-
-                console.error('No token found');
-                return;
-            }
-
-            const res = await axios.get(`${import.meta.env.VITE_BASE_URL}/dashboard`,{
-                headers:{
-                    Authorization: `Bearer ${token}`
-                }
-            })
-
+        try {
+            const res = await axiosPrivate.get('/dashboard');
             setHistory(res.data.history);
-
+        } catch (error) {
+            console.error('Reading history error:', error);
         }
-        catch(error){
-            console.error(error);
-        }
-
     }
 
     // Friends activity state
@@ -42,10 +24,7 @@ const History = () => {
 
     const fetchFriendsActivity = async () => {
         try {
-            const token = localStorage.getItem('token');
-            if (!token) return;
-            const res = await axios.get(`${import.meta.env.VITE_BASE_URL}/dashboard/friends/activity`, {
-                headers: { Authorization: `Bearer ${token}` },
+            const res = await axiosPrivate.get('/dashboard/friends/activity', {
                 params: { status: 'READING,COMPLETED', page: 1, pageSize: 9 }
             });
             setFriendsActivity(res.data);

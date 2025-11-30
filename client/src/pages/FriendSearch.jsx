@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { useLocation } from 'react-router-dom';
-import axios from 'axios';
+import { axiosPrivate } from '../api/axios';
 
 const FriendSearch = () => {
 
@@ -13,34 +13,23 @@ const FriendSearch = () => {
     const [error,setError] = useState('');
 
     const fetchFriend = async() => {
-
-        try{
-
-            const token = localStorage.getItem('token');
+        try {
             setLoading(true); setError('');
-            const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/dashboard/friends/search`,{
-                headers: {
-                    Authorization: `Bearer ${token}`
-                },
+            const response = await axiosPrivate.get('/dashboard/friends/search', {
                 params: {
                     query: friendName,
                     page: 1,
                     pageSize: 20
                 }
-            })
-
+            });
             setResults(response.data.items || []);
-
-        }
-        catch(err){
-            // Provide a clearer error for debugging (status + message)
+        } catch (err) {
             const status = err?.response?.status;
             const serverMsg = err?.response?.data?.error;
             const msg = serverMsg || (status ? `Request failed with status ${status}` : err?.message) || 'Failed to search';
             console.error('Friend search error:', err);
             setError(msg || 'Failed to search');
-        }
-        finally{
+        } finally {
             setLoading(false);
         }
     }
@@ -52,38 +41,23 @@ const FriendSearch = () => {
 
     const actions = {
         async add(userId){
-            const token = localStorage.getItem('token');
-            await axios.post(`${import.meta.env.VITE_BASE_URL}/dashboard/friends/request`, { toUserId: userId }, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            await axiosPrivate.post('/dashboard/friends/request', { toUserId: userId });
             await fetchFriend();
         },
         async accept(friendshipId){
-            const token = localStorage.getItem('token');
-            await axios.post(`${import.meta.env.VITE_BASE_URL}/dashboard/friends/respond`, { friendshipId, action: 'ACCEPT' }, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            await axiosPrivate.post('/dashboard/friends/respond', { friendshipId, action: 'ACCEPT' });
             await fetchFriend();
         },
         async decline(friendshipId){
-            const token = localStorage.getItem('token');
-            await axios.post(`${import.meta.env.VITE_BASE_URL}/dashboard/friends/respond`, { friendshipId, action: 'DENY' }, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            await axiosPrivate.post('/dashboard/friends/respond', { friendshipId, action: 'DENY' });
             await fetchFriend();
         },
         async cancel(friendshipId){
-            const token = localStorage.getItem('token');
-            await axios.post(`${import.meta.env.VITE_BASE_URL}/dashboard/friends/cancel`, { friendshipId }, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            await axiosPrivate.post('/dashboard/friends/cancel', { friendshipId });
             await fetchFriend();
         },
         async unfriend(friendshipId){
-            const token = localStorage.getItem('token');
-            await axios.delete(`${import.meta.env.VITE_BASE_URL}/dashboard/friends/${friendshipId}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            await axiosPrivate.delete(`/dashboard/friends/${friendshipId}`);
             await fetchFriend();
         }
     };

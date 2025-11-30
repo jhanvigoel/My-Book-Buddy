@@ -1,5 +1,5 @@
 import React from 'react'
-import axios from 'axios'
+import { axiosPrivate } from '../api/axios'
 import { useState } from 'react'
 import BookSearch from './BookSearch';
 import { useEffect } from 'react';
@@ -9,28 +9,15 @@ const DashboardBook = ({bookName}) => {
     const [books,setBooks] = useState([]);
 
     const fetchBooks = async() => {
-
-        try{
-
-            const token = localStorage.getItem('token');
-
-            if (!token) {
-                console.error('No token found');
-                return;
-            }
-
-            const res = await axios.get(`${import.meta.env.VITE_BASE_URL}/dashboard/book-search`, {
-                params: { q: bookName },
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
+        if (!bookName || !bookName.trim()) return;
+        try {
+            const res = await axiosPrivate.get('/dashboard/book-search', {
+                params: { q: bookName }
             });
             setBooks(res.data);
-
-        }catch(err){
-            console.error(err);
+        } catch (err) {
+            console.error('Error fetching dashboard books:', err);
         }
-
     }
 
     useEffect(() => {

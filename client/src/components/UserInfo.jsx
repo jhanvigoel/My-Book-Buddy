@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import axios from 'axios';
+import { axiosPrivate } from '../api/axios';
 
  
 const UserInfo = () => {
@@ -7,25 +7,10 @@ const UserInfo = () => {
     const [userData,setUserData] = useState(null);
 
     const fetchUserData = async() => {
-
-        try{
-
-            const token = localStorage.getItem('token');
-
-            if (!token) {
-                console.error('No token found');
-                return;
-            }
-
-            const res = await axios.get(`${import.meta.env.VITE_BASE_URL}/dashboard/profile`,{
-                headers:{
-                    Authorization: `Bearer ${token}`
-                }
-            })
-
+        try {
+            const res = await axiosPrivate.get('/dashboard/profile');
             setUserData(res.data.user);
-
-        }catch(error){
+        } catch (error) {
             console.error('Error fetching user data:', error);
         }
     }

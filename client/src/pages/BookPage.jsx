@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react'
 import { useParams, useLocation } from 'react-router-dom'
-import axios from 'axios';
+import axios from 'axios'; // still used for public Google Books API
+import { axiosPrivate } from '../api/axios';
 import DOMPurify from 'dompurify';
 
 const BookPage = () => {
@@ -32,34 +33,22 @@ const BookPage = () => {
     }, [bookId, info]);
 
     const addToReadingHistory = async (status) => {
-
-    try{
-
-        const token = localStorage.getItem('token');
-
-        const payload = {
-            title: info?.title,
-            author: info?.authors?.join(',') || undefined,
-            coverUrl: passedBook?.coverUrl || info?.imageLinks?.thumbnail || '',
-            googleVolumeId: info?.googleVolumeId || bookId,
-            infoLink: info?.infoLink,
-            status
-        };
-
-        const res = await axios.post(`${import.meta.env.VITE_BASE_URL}/dashboard/book/${bookId}`,payload,{
-            headers:{
-                Authorization: `Bearer ${token}`
-            }
-        })
-        
-        alert('Book added to your reading list!');
-        
+        try {
+            const payload = {
+                title: info?.title,
+                author: info?.authors?.join(',') || undefined,
+                coverUrl: passedBook?.coverUrl || info?.imageLinks?.thumbnail || '',
+                googleVolumeId: info?.googleVolumeId || bookId,
+                infoLink: info?.infoLink,
+                status
+            };
+            await axiosPrivate.post(`/dashboard/book/${bookId}`, payload);
+            alert('Book added to your reading list!');
+        } catch (error) {
+            console.error('Add to reading history error:', error);
+            alert(error.response?.data?.error || 'Failed to add book');
+        }
     }
-    catch(error){
-        console.error(error);
-        alert(error.response?.data?.error || 'Failed to add book');
-    }
-  }
   
         const toHttps = (u) => (typeof u === 'string' ? u.replace(/^http:\/\//, 'https://') : u);
         const normalizeGoogleCover = (u) => {

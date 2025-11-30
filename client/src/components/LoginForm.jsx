@@ -1,6 +1,6 @@
-import {React,useState} from 'react'
-import { Form, useNavigate } from 'react-router-dom'
-import axios from 'axios';
+import React, { useState, useContext } from 'react'
+import { useNavigate } from 'react-router-dom'
+import AuthContext from '../context/AuthContext.jsx';
 
 const LoginForm = () => {
 
@@ -19,38 +19,30 @@ const LoginForm = () => {
 
     }
 
+    const { login } = useContext(AuthContext);
+    const [submitting,setSubmitting] = useState(false);
+    const [error,setError] = useState('');
+
     async function handleSubmit(e) {
-
         e.preventDefault();
-
-        const payload = {
-
-            email : form.email,
-            password : form.password
+        setError('');
+        if (!form.email || !form.password){
+            setError('Please fill in both fields');
+            return;
         }
-
-        try{
-
-            const res = await axios.post(`${import.meta.env.VITE_BASE_URL}/login`,payload);
-
-            if (res.data?.error){
-                alert(res.data.error);
+        setSubmitting(true);
+        try {
+            const result = await login(form.email, form.password);
+            if (!result?.success) {
+                setError(result?.error?.message || 'Login failed');
                 return;
             }
-            else{
-                // Persist JWT token for authenticated requests
-                if (res.data?.token) {
-                    localStorage.setItem('token', res.data.token);
-                }
-                alert('login successful');
-                navigate('/dashboard');
-            }
+            navigate('/dashboard');
+        } catch (err){
+            setError(err?.message || 'Unexpected error');
+        } finally {
+            setSubmitting(false);
         }
-        catch(err){
-            console.log(err);
-            alert("Error Logging In");
-        }
-
     }
 
 
@@ -62,6 +54,12 @@ const LoginForm = () => {
             <div className = "text-1xl mb-4 text-center text-gray">
                 Enter your credentials below to access your account
             </div>
+
+            {error && (
+                <div className="px-4 py-3 mb-4 rounded bg-red-100 text-red-700 text-sm">
+                    {error}
+                </div>
+            )}
 
             <div className = "grid gap-4">
                 <div className = "text-1xl font-bold text-left">
@@ -86,7 +84,13 @@ const LoginForm = () => {
                 onChange = {handleChange} 
                 required/>
 
-                <button type = "submit" className = "mt-4 px-6 py-4 rounded-full bg-black font-bold text-3xl text-white hover:bg-gray-8 hover:-translate-y-2 transition-transform border">Login</button>
+                                <button
+                                    type = "submit"
+                                    disabled={submitting}
+                                    className = "mt-4 px-6 py-4 rounded-full bg-black font-bold text-3xl text-white hover:bg-gray-800 hover:-translate-y-2 transition-transform border disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    {submitting ? 'Logging in...' : 'Login'}
+                                </button>
 
                 <div className = "mt-8 text-1xl items-center justify-center text-center">
                     Don't have an account? <button type = "button" className = "underline hover:-translate-y-1" onClick = {() => {navigate('/signup')}}>Sign Up</button>

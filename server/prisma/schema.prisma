@@ -9,107 +9,98 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
   shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
 model User {
-  id Int @id @default(autoincrement())
-  name String @db.VarChar(191)
-  email String @unique @db.VarChar(191)
-  phone String @unique @db.VarChar(15)
+  id       Int    @id @default(autoincrement())
+  name     String @db.VarChar(191)
+  email    String @unique @db.VarChar(191)
+  phone    String @unique @db.VarChar(15)
   password String
-  
+
   readingHistory ReadingHistory[]
 
-  friendshipsInitiated Friends[] @relation("Friends_friend1")
-  friendshipsReceived Friends[] @relation("Friends_friend2")
-  refrehTokens RefreshToken[]
+  friendshipsInitiated Friends[]      @relation("Friends_friend1")
+  friendshipsReceived  Friends[]      @relation("Friends_friend2")
+  refrehTokens         RefreshToken[]
 
   @@index([name])
-
 }
 
 model Book {
-
-  id Int @id @default(autoincrement())
-  title String
-  author String
+  id       Int     @id @default(autoincrement())
+  title    String
+  author   String
   coverUrl String?
 
   googleVolumeId String? @unique
-  infoLink String?
+  infoLink       String?
 
   readingHistories ReadingHistory[]
 
   @@index([title])
   @@index([author])
-
 }
 
-enum ReadStatus{
+enum ReadStatus {
   WANT_TO_READ
   READING
   COMPLETED
 }
 
 model ReadingHistory {
-
-  id Int @id @default(autoincrement())
-  userId Int 
+  id     Int @id @default(autoincrement())
+  userId Int
   bookId Int
 
-  user User @relation(fields:[userId],references: [id],onDelete: Cascade)
-  book Book @relation(fields:[bookId],references: [id],onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book Book @relation(fields: [bookId], references: [id], onDelete: Cascade)
 
-  status ReadStatus 
-  currentPage Int @default(0)
+  status      ReadStatus
+  currentPage Int        @default(0)
 
-  startedAt DateTime?
+  startedAt  DateTime?
   finishedAt DateTime?
 
-  @@unique([userId,bookId])
-  @@index([userId,status])
-
+  @@unique([userId, bookId])
+  @@index([userId, status])
 }
 
-enum FriendStatus{
+enum FriendStatus {
   ACCEPTED
   PENDING
   DENIED
 }
 
 model Friends {
-
-  id Int @id @default(autoincrement())
+  id        Int @id @default(autoincrement())
   friend1Id Int
   friend2Id Int
 
-  friend1 User @relation("Friends_friend1",fields:[friend1Id],references: [id],onDelete: Cascade)
-  friend2 User @relation("Friends_friend2",fields:[friend2Id],references: [id],onDelete: Cascade)
+  friend1 User @relation("Friends_friend1", fields: [friend1Id], references: [id], onDelete: Cascade)
+  friend2 User @relation("Friends_friend2", fields: [friend2Id], references: [id], onDelete: Cascade)
 
-  status FriendStatus @default(PENDING)
-  createdAt DateTime @default(now())
+  status    FriendStatus @default(PENDING)
+  createdAt DateTime     @default(now())
 
-  @@unique([friend1Id,friend2Id])
-  @@index([friend2Id,status])
-  @@index([friend1Id,status])
+  @@unique([friend1Id, friend2Id])
+  @@index([friend2Id, status])
+  @@index([friend1Id, status])
 }
 
-model RefreshToken{
-
-  id Int @id @default(autoincrement())
-  userId Int
-  tokenHash String @unique
-  createdAt DateTime @default(now())
-  expiresAt DateTime 
+model RefreshToken {
+  id        Int       @id @default(autoincrement())
+  userId    Int
+  tokenHash String    @unique
+  createdAt DateTime  @default(now())
+  expiresAt DateTime
   revokedAt DateTime?
-  replacedById Int?
 
-  user User @relation(fields:[userId], references:[id], onDelete: Cascade)
-  replacedBy RefreshToken? @relation("TokenReplacement",fields:[replacedById], references:[id])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([userId,revokedAt])
+  @@index([userId, revokedAt])
   @@index([expiresAt])
 }
