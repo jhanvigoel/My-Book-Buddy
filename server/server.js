@@ -15,9 +15,9 @@ app.use(cors({ origin: effectiveOrigin, credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
 
-app.use('/',nonUserRouter);
-app.use('/',router);
-app.use('/',Userrouter);
+app.use('/', nonUserRouter);
+app.use('/', router);
+app.use('/', Userrouter);
 
 const PORT = process.env.PORT || 5000;
 

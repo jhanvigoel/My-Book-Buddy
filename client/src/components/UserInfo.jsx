@@ -1,23 +1,28 @@
 import React, { useEffect, useState } from 'react'
 import { axiosPrivate } from '../api/axios';
+import { useAuth } from '../context/AuthContext.jsx';
 
  
 const UserInfo = () => {
 
     const [userData,setUserData] = useState(null);
 
-    const fetchUserData = async() => {
-        try {
-            const res = await axiosPrivate.get('/dashboard/profile');
-            setUserData(res.data.user);
-        } catch (error) {
-            console.error('Error fetching user data:', error);
-        }
-    }
+    const { accessToken, loading } = useAuth();
 
     useEffect(() => {
-        fetchUserData();
-    }, [])
+        if (loading) return; // wait for initial refresh attempt
+        if (!accessToken) return; // not logged in
+        let cancelled = false;
+        (async () => {
+            try {
+                const res = await axiosPrivate.get('/dashboard/profile');
+                if (!cancelled) setUserData(res.data.user);
+            } catch (error) {
+                if (!cancelled) console.error('Error fetching user data:', error);
+            }
+        })();
+        return () => { cancelled = true; };
+    }, [accessToken, loading]);
 
   return (
     <div>

@@ -1,9 +1,38 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import femaleavatar from '../assets/femaleavatar.svg'
 import maleavatar from '../assets/maleavatar.svg'
 import UserInfo from '../components/UserInfo'
+import { useNavigate } from 'react-router-dom'
+import AuthContext from '../context/AuthContext.jsx'
 
 const Profile = () => {
+
+  const navigate = useNavigate();
+
+  const {logout} = useContext(AuthContext);
+
+  const handleLogout = async () => {
+
+    try{
+
+      const res = await logout();
+
+      if (res?.success){
+        navigate('/');
+        return res.status(200).json({ message: "Logged out successfully" });
+      }
+      else{
+        return res.status(500).json({ error: 'Logout failed' });
+      }
+
+    }catch(err){
+
+      console.error('Logout failed:', err);
+      return res.status(500).json({ error: 'Logout failed' });
+    }
+
+  }
+
   return (
     <div>
 
@@ -26,6 +55,8 @@ const Profile = () => {
           <UserInfo />
         </div>
       </div>
+
+       <button className = 'mt-10 px-8 py-4 rounded-full bg-red-600 font-bold text-white hover:bg-red-500 hover:-translate-y-1 transition-transform' onClick={handleLogout}>Logout</button>
 
         </div>
     </div>

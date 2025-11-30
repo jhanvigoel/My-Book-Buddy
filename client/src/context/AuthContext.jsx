@@ -12,13 +12,15 @@ export function AuthProvider({ children }) {
       const { data } = await axiosPublic.post('/refresh-token');
       if (data?.accessToken) {
         setAccessToken(data.accessToken);
-        return true;
+        // Also update axios default header for immediate subsequent calls
+        axiosPrivate.defaults.headers.common['Authorization'] = `Bearer ${data.accessToken}`;
+        return data.accessToken; // return fresh token for immediate use
       }
       setAccessToken(null);
-      return false;
+      return null;
     } catch (err) {
       setAccessToken(null);
-      return false;
+      return null;
     }
   }, []);
 
@@ -47,9 +49,9 @@ export function AuthProvider({ children }) {
         if (!original || original._retry) return Promise.reject(err);
         if (err.response && [401, 403].includes(err.response.status)) {
           original._retry = true;
-          const ok = await refreshTokens();
-          if (ok) {
-            original.headers['Authorization'] = `Bearer ${accessToken}`;
+          const newToken = await refreshTokens();
+          if (newToken) {
+            original.headers['Authorization'] = `Bearer ${newToken}`;
             return axiosPrivate(original);
           }
         }
@@ -68,6 +70,7 @@ export function AuthProvider({ children }) {
       const { data } = await axiosPublic.post('/login', { email, password });
       if (data?.accessToken) {
         setAccessToken(data.accessToken);
+        axiosPrivate.defaults.headers.common['Authorization'] = `Bearer ${data.accessToken}`;
         return { success: true };
       }
       return { success: false, error: new Error('No access token returned') };
@@ -78,9 +81,11 @@ export function AuthProvider({ children }) {
 
   const logout = useCallback(async () => {
     try {
-      await axiosPublic.post('/logout');
+      await axiosPublic.post('/dashboard/profile');
+      return {success: true};
     } catch (err) {
-      // ignore for now
+        console.error('Logout error:', err);
+        return {success: false, error: err};
     } finally {
       setAccessToken(null);
     }

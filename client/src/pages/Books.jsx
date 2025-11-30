@@ -1,7 +1,5 @@
 import { axiosPublic } from '../api/axios';
-import React from 'react'
-import { useEffect } from 'react';
-import { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import BookSearch from '../components/BookSearch';
 
 const Books = () => {
@@ -16,32 +14,51 @@ const Books = () => {
 
     const handleInputChange = (e) => setSearch(e.target.value);
 
-    const fetchBooks = async() => {
-
-        try{
-
-            const response = await axiosPublic.get('/books');
+    const fetchBooks = async (signal) => {
+        try {
+            const response = await axiosPublic.get('/books', { signal });
             setBooks(response.data);
         } catch (error) {
+            if (error.name === 'CanceledError') return;
             console.error("Error fetching books:", error);
         }
     }
 
-    const handleSearch = async() =>{
-
-        try{
-
-            const response = await axiosPublic.get(`/books`, { params: { q: search } });
-            setLastSearch(search);
+    const handleSearch = async () => {
+        const term = search.trim();
+        
+        if (!term) {
+            setUsed(false);
+            setLastSearch('');
+            const controller = new AbortController();
+            await fetchBooks(controller.signal);
+            return () => controller.abort();
+        }
+        try {
+            const response = await axiosPublic.get(`/books`, { params: { q: term } });
+            setLastSearch(term);
             setBooks(response.data);
+            setUsed(true);
         } catch (error) {
             console.error("Error searching books:", error);
         }
     }
 
     useEffect(() => {
-        fetchBooks();
+        const controller = new AbortController();
+        fetchBooks(controller.signal);
+        return () => controller.abort();
     }, [])
+
+    useEffect(() => {
+        if (search.trim() === '') {
+            const controller = new AbortController();
+            fetchBooks(controller.signal);
+            setUsed(false);
+            setLastSearch('');
+            return () => controller.abort();
+        }
+    }, [search])
 
     return (
         <div className="min-h-screen w-full bg-gradient-to-br from-[#f3e8ff] via-[#e0e7ff] to-[#f8fafc] py-16 px-4 flex flex-col items-center">
@@ -57,17 +74,17 @@ const Books = () => {
                         className="w-full h-full outline-none placeholder-gray-400 text-gray-700 bg-transparent text-base px-2"
                         value={search}
                         onChange={handleInputChange}
-                        onKeyPress = {(e) => {
-                            if (e.key === "Enter"){
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                                e.preventDefault();
                                 handleSearch();
-                                setUsed(true);
                             }
                         }}
                     />
                     <button
                         type="button"
                         className="bg-[#8C87AA] w-28 h-9 rounded-full text-sm text-white font-semibold hover:bg-[#6c6699] transition"
-                        onClick={() => { handleSearch(); setUsed(true); }}
+                        onClick={() => { handleSearch(); }}
                     >
                         Search
                     </button>
