@@ -1,0 +1,89 @@
+.cursor{
+  display: inline-block;
+  position: relative;
+  border-right: 2px solid black;
+  white-space: nowrap;
+  overflow: hidden;
+  width: 0ch;
+}
+
+.typewriter-animation {
+  animation:
+    typewriter var(--dur, 3s) steps(var(--steps, 20)) var(--delay, 0.4s) both,
+    blinkingCursor 700ms steps(1) var(--delay, 0.4s) infinite,
+    hideCaret 1ms linear calc(var(--delay, 0.4s) + var(--dur, 3s)) forwards;
+}
+@keyframes typewriter {
+  from { width: 0ch; }
+  to { width: var(--w, 20ch); }
+}
+@keyframes blinkingCursor{
+  from { border-right-color: black; }
+  to { border-right-color: transparent; }
+}
+
+@keyframes hideCaret {
+  to { border-right-color: transparent; }
+}
+
+.home-bg {
+  position: relative;
+  background: linear-gradient(135deg, #f0ecff 0%, #eef6ff 50%, #ffffff 100%);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+.home-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient( at 10% 20%, rgba(204,187,255,0.25) 0%, transparent 25% ),
+                    radial-gradient( at 85% 80%, rgba(208,238,255,0.18) 0%, transparent 20% );
+  z-index: 0;
+}
+
+.home-bg > * { position: relative; z-index: 1; }
+.home-bg .bg-decor { position: absolute !important; inset: 0; z-index: 0 !important; pointer-events: none; }
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+@keyframes float-slow {
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-18px) rotate(5deg);
+  }
+}
+
+@keyframes float-delay {
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-14px) rotate(-3deg);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-float-slow {
+  animation: float-slow 5s ease-in-out infinite;
+}
+
+.animate-float-delay {
+  animation: float-delay 4s ease-in-out infinite 1s;
+}

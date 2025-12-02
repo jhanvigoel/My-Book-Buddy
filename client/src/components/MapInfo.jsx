@@ -9,7 +9,7 @@ const MapInfo = () => {
   return (
     <div>
 
-        <div className = "min-h-screen flex flex-col md:flex-row items-center justify-center  bg-[#FCF3EE] p-8">
+        <div className = "min-h-screen flex flex-col md:flex-row items-center justify-center p-8">
             <div className = "flex-1 flex flex-col items-center justify-center p-8"> 
                 <img src = {path} className = "w-100 object-contain rounded-lg"/>
             </div>
