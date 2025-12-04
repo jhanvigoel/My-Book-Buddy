@@ -4,7 +4,7 @@ import LOGO from '../assets/LOGO.svg'
 const Footer = () => {
   return (
     <div>
-        <div className="px-6 md:px-16 lg:px-24 xl:px-32 pt-8 w-full text-gray-500 bg-purple-100">
+        <div className="px-6 md:px-16 lg:px-24 xl:px-32 pt-8 w-full text-gray-500">
             <div className="flex flex-col md:flex-row justify-between w-full gap-10 border-b border-gray-500/30 pb-6">
                 <div className="md:max-w-96">
                     <img src = {LOGO} alt = 'LOGO' className = 'w-20 h-20 mb-4'/>
