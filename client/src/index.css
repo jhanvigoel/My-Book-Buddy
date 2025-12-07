@@ -6,5 +6,11 @@
   font-family: "JetBrains Mono", monospace;
 }
 
+body{
+  margin : 0;
+  background: #F0EBFF; 
+  color: #1f2937;
+}
+
 
 

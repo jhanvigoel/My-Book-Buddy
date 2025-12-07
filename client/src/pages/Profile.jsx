@@ -56,7 +56,10 @@ const Profile = () => {
         </div>
       </div>
 
-       <button className = 'mt-10 px-8 py-4 rounded-full bg-red-600 font-bold text-white hover:bg-red-500 hover:-translate-y-1 transition-transform' onClick={handleLogout}>Logout</button>
+      <div className = "mt-auto flex justify-end">
+
+        <button className = 'px-8 py-4 rounded-full bg-red-600 font-bold text-white hover:bg-red-500 hover:-translate-y-1 transition-transform ' onClick={handleLogout}>Logout</button>
+      </div>
 
         </div>
     </div>

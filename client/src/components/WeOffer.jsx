@@ -8,7 +8,9 @@ const WeOffer = () => {
   return (
         <div className="min-h-screen w-full py-16 px-4">
             <h1 className="text-4xl sm:text-5xl font-extrabold text-center text-black mb-14">What We Offer</h1>
+
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 max-w-7xl mx-auto">
+                
                 <div className="relative bg-blue-50 p-8 rounded-3xl shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-transform text-center border border-[#8C87AA]/10">
                     <span aria-hidden className="pointer-events-none absolute top-2 left-2 right-6 h-3 rounded-full bg-blue-500"></span>
                     <img src={BOOKS} alt="" className="w-16 h-16 mx-auto mb-4" />

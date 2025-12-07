@@ -2,6 +2,7 @@ import React from 'react'
 import LOGO from '../assets/LOGO.svg'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 
 const UserNavbar = () => {
 
@@ -29,6 +30,8 @@ const UserNavbar = () => {
         <div className = "p-6 mt-3 flex items-center justify-between">
 
         <div className = "flex md:justify-start items-center gap-4">
+
+          <ArrowLeft className = "cursor-pointer w-6"onClick = {() => navigate(-1)} />
 
            <img src = {LOGO} alt = "Logo" className = "w-16 h-16 mb-4"/>
 
