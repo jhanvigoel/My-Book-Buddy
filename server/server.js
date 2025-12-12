@@ -10,8 +10,21 @@ import './Models/db.js';
 
 const app = express();
 
-const effectiveOrigin = process.env.CLIENT_ORIGIN || 'http://localhost:5173';
-app.use(cors({ origin: effectiveOrigin, credentials: true }));
+const allowedOrigins = (process.env.CLIENT_ORIGIN || 'http://localhost:5173')
+    .split(',')
+    .map(origin => origin.trim())
+    .filter(Boolean);
+
+
+app.use(cors({
+    origin: (origin, callback) => {
+        if (!origin) return callback(null, true); 
+        if (allowedOrigins.includes(origin)) return callback(null, true);
+        return callback(new Error('Not allowed by CORS'), false);
+    },
+    credentials: true
+}));
+
 app.use(express.json());
 app.use(cookieParser());
 
@@ -24,7 +37,7 @@ const PORT = process.env.PORT || 5000;
 function logStartup() {
     const requiredSecrets = ['ACCESS_SECRET', 'REFRESH_SECRET', 'JWT_SECRET'];
     const missing = requiredSecrets.filter(k => !process.env[k]);
-    console.log('[Startup] CORS origin:', effectiveOrigin);
+    console.log('[Startup] Allowed CORS origins:', allowedOrigins.join(', '));
     if (missing.length) {
         console.warn('[Startup] Missing auth secrets:', missing.join(', '));
     } else {
