@@ -1,13 +1,20 @@
-import React, { useContext } from 'react'
+import React, { useContext, useRef, useState, useEffect} from 'react'
 import femaleavatar from '../assets/femaleavatar.svg'
 import maleavatar from '../assets/maleavatar.svg'
 import UserInfo from '../components/UserInfo'
 import { useNavigate } from 'react-router-dom'
 import AuthContext from '../context/AuthContext.jsx'
+import { axiosPrivate } from '../api/axios.js'
 
 const Profile = () => {
 
   const navigate = useNavigate();
+
+  const [file,setFile] = useState('');
+
+  const fileInputRef = useRef(null);
+
+  const [profilePhoto,setProfilePhoto] = useState(maleavatar);
 
   const {logout} = useContext(AuthContext);
 
@@ -33,6 +40,65 @@ const Profile = () => {
 
   }
 
+  const handleFileChange = async(e) => {
+
+    const file = e.target.files[0];
+
+    if (!file){
+      return;
+    }
+
+    const formData = new FormData();
+
+    formData.append('file',file);
+    formData.append('upload_preset','My-Book-Buddy');
+    formData.append('cloud_name',import.meta.env.VITE_CLOUDINARY_CLOUD_NAME);
+
+    try{
+
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${import.meta.env.VITE_CLOUDINARY_CLOUD_NAME}/image/upload`,{
+        method : 'POST' , body : formData
+      })
+
+      const data = await res.json();
+
+      await axiosPrivate.post('/dashboard/profile/upload-photo',{photoUrl : data.secure_url});
+
+      setProfilePhoto(data.secure_url);
+
+    } catch(err){
+      console.error('upload failed',err);
+      alert('Upload failed');
+    }
+    
+  };
+
+  useEffect(() => {
+
+    const fetchPhoto = async() => {
+
+      try{
+
+        const data = await axiosPrivate.get('/dashboard/profile/upload-photo');
+
+        if (!data.photoUrl){
+          return;
+        }
+
+        setProfilePhoto(data.photoUrl);
+
+        
+      }
+      catch(err){
+        console.log(err);
+      }
+
+    }
+
+    fetchPhoto();
+
+  },[])
+
   return (
     <div>
 
@@ -44,9 +110,11 @@ const Profile = () => {
     
         <div className="w-full md:w-1/3 flex flex-col items-center md:items-start gap-4">
 
-          <img src={maleavatar} alt="User avatar" className="w-48 h-48 md:w-56 md:h-56 object-cover rounded-full" />
+          <img src={profilePhoto} alt="User avatar" className="w-48 h-48 md:w-56 md:h-56 object-cover rounded-full" />
 
-          <button className="px-12 py-3 rounded-full bg-[#8C87AA] font-bold text-white hover:bg-[#8C87AA]/80 hover:-translate-y-1 transition-transform">Change Avatar</button>
+          <input type = "file" ref = {fileInputRef} style = {{display : 'none'}} onChange= {handleFileChange} />
+
+          <button className="px-12 py-3 rounded-full bg-[#8C87AA] font-bold text-white hover:bg-[#8C87AA]/80 hover:-translate-y-1 transition-transform" onClick = {() => fileInputRef.current.click()}>Upload Avatar</button>
 
         </div>
 

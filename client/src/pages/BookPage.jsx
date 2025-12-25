@@ -1,26 +1,48 @@
 import React, { useEffect, useState, useMemo } from 'react'
 import { useParams, useLocation } from 'react-router-dom'
-import axios from 'axios'; // still used for public Google Books API
+import axios from 'axios';
 import { axiosPrivate } from '../api/axios';
 import DOMPurify from 'dompurify';
+import BookReview from '../components/BookReview';
 
-const BookPage = () => {
-    const { bookId } = useParams();
+const BookPage = () => { 
+    const {bookId} = useParams();
     const location = useLocation();
     const passedBook = location.state?.book;
     const [info, setInfo] = useState(() => passedBook?.volumeInfo || null);
+
+    const id = info?.googleVolumeId || passedBook.googleVolumeId;
     const [cover,setCover] = useState(passedBook?.coverUrl || '');
     const [loading, setLoading] = useState(!passedBook?.volumeInfo);
     const [error, setError] = useState('');
+    const [addReview,setAddReview] = useState(false);
+    const [reviewContent,setReviewContent] = useState('');
+    const [newState,setSate] = useState(false);
+    const [reviews,getReviews] = useState([]);
 
     useEffect(() => {
         const fetchById = async () => {
-            if (info || !bookId) return;
+
+            if (!bookId){
+                return;
+            }
+
             try {
                 setLoading(true);
                 setError('');
+            
                 const res = await axios.get(`https://www.googleapis.com/books/v1/volumes/${bookId}`);
                 setInfo(res.data?.volumeInfo || {});
+                
+                try {
+                    const reviewsRes = await axiosPrivate.get(`/dashboard/book/${bookId}/reviews`);
+                    getReviews(reviewsRes.data);
+                } catch (reviewError) {
+                    if (reviewError.response?.status !== 404) {
+                        console.error('Error fetching reviews:', reviewError);
+                    }
+                    getReviews([]);
+                }
             } catch (e) {
                 console.error('Failed to fetch book by id:', e);
                 setError('Failed to load book details');
@@ -30,15 +52,15 @@ const BookPage = () => {
             }
         };
         fetchById();
-    }, [bookId, info]);
+    }, [bookId]);
 
     const addToReadingHistory = async (status) => {
         try {
             const payload = {
                 title: info?.title,
-                author: info?.authors?.join(',') || undefined,
+                author: info?.authors?.join(',') || 'Unknown Author',
                 coverUrl: passedBook?.coverUrl || info?.imageLinks?.thumbnail || '',
-                googleVolumeId: info?.googleVolumeId || bookId,
+                googleVolumeId: bookId,
                 infoLink: info?.infoLink,
                 status
             };
@@ -59,13 +81,38 @@ const BookPage = () => {
         };
         
         const imageUrl = normalizeGoogleCover(
-            cover ||
-            info?.imageLinks?.large ||
-            info?.imageLinks?.medium ||
-            info?.imageLinks?.small ||
-            info?.imageLinks?.thumbnail ||
-            info?.imageLinks?.smallThumbnail || '' 
+            info?.imageLinks?.smallThumbnail || cover
         );
+
+        const handleReview = async () => {
+
+            try{
+
+
+                const payload = {
+                    title: info?.title,
+                    author: info?.authors?.join(',') || 'Unknown Author',
+                    coverUrl: passedBook?.coverUrl || info?.imageLinks?.thumbnail || '',
+                    googleVolumeId : bookId,
+                    text : reviewContent,
+                    rating : 1,
+                    infoLink: info?.infoLink,
+                }
+
+                await axiosPrivate.post(`/dashboard/book/${bookId}/reviews`,payload);
+                alert("Review added successfully");
+                
+                const reviewsRes = await axiosPrivate.get(`/dashboard/book/${bookId}/reviews`);
+                getReviews(reviewsRes.data);
+                
+                setReviewContent('');
+                setAddReview(false);
+            }
+            catch(err){
+                console.error('error adding review:', err);
+                alert('Failed to add review');
+            }
+        }
 
   return (
     <div>
@@ -120,6 +167,24 @@ const BookPage = () => {
 
             </div>
 
+            <div className="mt-6 mr-10 flex justify-end items-center">
+                    <button className = "p-4 text-3xl font-semibold text-gray-800 border rounded-xl" onClick = {() => {setAddReview(!addReview) ; setSate(false)}}>ADD REVIEW</button>
+            </div>
+
+            {addReview && <div> 
+                 <div className = "text-lg font-semibold text-gray-800">ADD REVIEW HERE</div>
+                 <div className = "mt-4">
+                    <textarea className = "w-full h-32 p-4 border border-gray-300 rounded-lg" onChange={(e) => setReviewContent(e.target.value)} placeholder='Write Review'></textarea>
+                 </div>
+ 
+                 <button className = "text-lg font-semibold" onClick= {handleReview}>POST REVIEW</button>
+                </div>}
+
+                <div className = "mt-6 ">
+                    {reviews.length > 0 && reviews.map((review,index) => (
+                        <BookReview data = {review} key = {index} />
+                    ))}
+                </div>
         </div>
     </div>
   )

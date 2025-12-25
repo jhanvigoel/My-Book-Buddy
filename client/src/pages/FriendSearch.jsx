@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { useLocation } from 'react-router-dom';
 import { axiosPrivate } from '../api/axios';
+import maleavatar from '../assets/maleavatar.svg'
 
 const FriendSearch = () => {
 
@@ -36,7 +37,6 @@ const FriendSearch = () => {
 
     useEffect(() => {
         if (friendName) fetchFriend();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [friendName]);
 
     const actions = {
@@ -79,6 +79,13 @@ const FriendSearch = () => {
                         const r = u.relation;
                         return (
                         <div key = {u.id} className = 'p-6 border rounded-lg shadow-md hover:shadow-xl transition-shadow'>
+                            <img 
+                                src = {u.photoUrl || maleavatar} 
+                                alt={u.name}
+                                className = "w-16 h-16 rounded-lg object-cover mb-2"
+                                referrerPolicy="no-referrer"
+                                onError={(e) => e.target.src = maleavatar}
+                            />
                             <div className = 'text-xl font-bold'>{u.name}</div>
                             <div className = 'text-gray-500'>{u.email}</div>
                             <div className='mt-4 flex items-center gap-3'>

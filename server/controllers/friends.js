@@ -28,6 +28,7 @@ export async function searchPeople(req, res) {
           name: true,
           email: true,
           phone: true,
+          photoUrl: true,
           friendshipsInitiated: { //second people have initiated friendship with us
             where: { friend2Id: me },
             select: { id: true, status: true, friend1Id: true, friend2Id: true },
@@ -53,6 +54,7 @@ export async function searchPeople(req, res) {
         name: u.name,
         email: u.email,
         phone: u.phone,
+        photoUrl: u.photoUrl,
         relation: rel
           ? {
               friendshipId: rel.id,
@@ -118,7 +120,6 @@ export async function respondToRequest(req, res) {
   }
 }
 
-// POST /friends/cancel { friendshipId }
 export async function cancelPending(req, res) {
   try {
     const me = Number(req.user.id);
@@ -134,7 +135,6 @@ export async function cancelPending(req, res) {
   }
 }
 
-// DELETE /friends/:id
 export async function unfriend(req, res) {
   try {
     const me = Number(req.user.id);
@@ -171,6 +171,7 @@ export const FriendRequests = async (req,res) => {
                       name : true,
                       email : true,
                       phone : true,
+                      photoUrl : true,
                  }
              }
          },
@@ -194,6 +195,7 @@ export const FriendRequests = async (req,res) => {
               name : true,
               email : true,
               phone : true,
+              photoUrl : true,
             }
           }
         },
@@ -218,6 +220,7 @@ export const FriendRequests = async (req,res) => {
                 name : true,
                 email : true,
                 phone : true,
+                photoUrl : true,
               }
            },
            friend2 : {
@@ -226,6 +229,7 @@ export const FriendRequests = async (req,res) => {
                 name : true,
                 email : true,
                 phone : true,
+                photoUrl : true,
               }
            }
         }
@@ -247,19 +251,19 @@ export const FriendRequests = async (req,res) => {
     }
 }
 
-// GET /dashboard/friends/activity?status=READING,COMPLETED&page=1&pageSize=20
+
 export async function friendsActivity(req, res) {
   try {
     const me = Number(req.user.id);
     const page = Math.max(parseInt(req.query.page || '1', 10), 1);
     const pageSize = Math.min(Math.max(parseInt(req.query.pageSize || '20', 10), 1), 100);
-    // statuses filter
+   
     const statuses = String(req.query.status || 'READING,COMPLETED')
       .split(',')
       .map((s) => s.trim().toUpperCase())
       .filter(Boolean);
 
-    // find accepted friendships involving me
+
     const rels = await prisma.friends.findMany({
       where: {
         status: 'ACCEPTED',

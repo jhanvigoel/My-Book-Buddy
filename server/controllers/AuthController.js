@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import crypto from "crypto";
 
 function ensureSecrets() {
+
     const required = ['ACCESS_SECRET', 'REFRESH_SECRET', 'JWT_SECRET'];
     const missing = required.filter(k => !process.env[k]);
     if (missing.length) {
@@ -11,6 +12,7 @@ function ensureSecrets() {
         return { ok: false, missing };
     }
     return { ok: true };
+    
 }
 
 function createAccessToken(id) {
@@ -157,7 +159,6 @@ export const LogoutController = async (req, res) => {
             });
         }
 
-        // Cookie was set with path '/'
         res.clearCookie('refreshToken', { path: '/' });
         return res.status(200).json({ message: 'Logout successful' });
     } catch (err) {
@@ -166,6 +167,7 @@ export const LogoutController = async (req, res) => {
 };
 
 export const RefreshTokenController = async (req, res) => {
+
     const secretsOk = ensureSecrets();
     if (!secretsOk.ok) {
         return res.status(500).json({ error: 'Server configuration error: missing secrets' });

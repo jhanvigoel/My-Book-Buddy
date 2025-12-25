@@ -14,10 +14,12 @@ model User {
   email                String           @unique @db.VarChar(191)
   phone                String           @unique @db.VarChar(15)
   password             String
+  photoUrl             String?
   friendshipsInitiated Friends[]        @relation("Friends_friend1")
   friendshipsReceived  Friends[]        @relation("Friends_friend2")
   readingHistory       ReadingHistory[]
-  refrehTokens         RefreshToken[]
+  refreshTokens         RefreshToken[]
+  reviews Review[]
 
   @@index([name])
 }
@@ -30,6 +32,7 @@ model Book {
   googleVolumeId   String?          @unique
   infoLink         String?
   readingHistories ReadingHistory[]
+  reviews Review[]
 
   @@index([title])
   @@index([author])
@@ -50,7 +53,7 @@ model ReadingHistory {
   @@index([userId, status])
 }
 
-/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
+
 model Friends {
   id        Int          @id @default(autoincrement())
   friend1Id Int
@@ -77,6 +80,23 @@ model RefreshToken {
   @@index([userId, revokedAt])
   @@index([expiresAt])
 }
+
+model Review {
+
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  bookId     Int
+  createdAt  DateTime @default(now())
+  content    String   @db.Text
+  rating     Int      @default(0)
+
+  user       User     @relation(fields: [userId],references :[id], onDelete: Cascade)
+  book       Book     @relation(fields: [bookId],references: [id], onDelete: Cascade)
+
+  @@index([bookId,createdAt])
+  @@index([userId])
+}
+
 
 enum ReadStatus {
   WANT_TO_READ

@@ -3,7 +3,7 @@ import UserNavbar from '../components/UserNavbar'
 import DashboardBook from '../components/DashboardBook'
 import { useLocation, useParams } from 'react-router-dom'
 
-const Search = ({}) => {
+const Search = ({item}) => {
 
     const book = useLocation().state?.book;
     

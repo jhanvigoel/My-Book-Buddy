@@ -12,7 +12,8 @@ export const getUserProfile = async(req,res) => {
                 id: true,
                 name: true,
                 email: true,
-                phone: true
+                phone: true,
+                photoUrl: true
             }
         })
 
@@ -26,4 +27,61 @@ export const getUserProfile = async(req,res) => {
         console.error(error);
         return res.status(500).json({error: error.message});
     }
+}
+
+export const getProfilePhoto = async(req,res) => {
+
+    try{
+
+        const userId = req.user.id;
+
+        const data = await prisma.user.findUnique({
+
+            where: {
+                id : userId
+            },
+            select : {
+                photoUrl : true
+            }
+        })
+
+        if (!data){
+            return res.status(404).json({error: "User Not Found"});
+        }
+
+        return res.status(200).json({photoUrl : data.photoUrl});
+
+    }
+    catch(err){
+
+        return res.status(500).json({error: err.message});
+
+    }
+
+}
+
+export const uploadProfilePhoto = async(req,res) => {
+
+    try{
+
+        const userId = req.user.id;
+
+        const {photoUrl} = req.body;
+
+        const data = await prisma.user.update({
+            where:{
+                id: userId
+            },
+            data : {
+                photoUrl : photoUrl
+            }
+        });
+
+        return res.status(200).json({message: 'Photo Upload Successful'});
+
+    }
+    catch(err){
+        return res.status(500).json({error : err.message});
+    }
+
 }

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { axiosPrivate } from '../api/axios';
+import maleavatar from '../assets/maleavatar.svg'
 
 const FriendInfo = () => {
 
@@ -99,6 +100,13 @@ const FriendInfo = () => {
                             const id = getId(it);
                             return (
                                 <div key={id} className='p-4 border rounded'>
+                                    <img 
+                                        src={from?.photoUrl || maleavatar} 
+                                        alt={from?.name}
+                                        className="rounded-lg w-16 h-16 object-cover mb-2"
+                                        referrerPolicy="no-referrer"
+                                        onError={(e) => e.target.src = maleavatar}
+                                    />
                                     <div className='text-xl font-bold'>{from?.name || 'Unknown'}</div>
                                     <div className='text-gray-500'>{from?.email || ''}</div>
                                     <div className='mt-4 flex items-center gap-3'>
@@ -133,6 +141,13 @@ const FriendInfo = () => {
                             const id = getId(it);
                             return (
                                 <div key={id} className='p-4 border rounded'>
+                                    <img 
+                                        src={to?.photoUrl || maleavatar} 
+                                        alt={to?.name}
+                                        className="rounded-lg w-16 h-16 object-cover mb-2"
+                                        referrerPolicy="no-referrer"
+                                        onError={(e) => e.target.src = maleavatar}
+                                    />
                                     <div className='text-xl font-bold'>{to?.name || 'Unknown'}</div>
                                     <div className='text-gray-500'>{to?.email || ''}</div>
                                     <div className = 'mt-4 flex items-center gap-3'>
@@ -144,7 +159,7 @@ const FriendInfo = () => {
                                         </button>
                                     </div>  
                                 </div>
-                            )
+                            );
                         })}
                     </div>
                 )}
@@ -161,6 +176,13 @@ const FriendInfo = () => {
                             const id = getId(it);
                             return (
                                 <div key={id} className='p-4 border rounded'>     
+                                    <img 
+                                        src={friend?.photoUrl || maleavatar} 
+                                        alt={friend?.name}
+                                        className="rounded-lg w-16 h-16 object-cover mb-2"
+                                        referrerPolicy="no-referrer"
+                                        onError={(e) => e.target.src = maleavatar}
+                                    />
                                     <div className='text-xl font-bold'>{friend?.name || 'Unknown'}</div>
                                     <div className='text-gray-500'>{friend?.email || ''}</div>
                                     <div className = 'mt-4 flex items-center gap-3'>    

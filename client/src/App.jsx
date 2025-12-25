@@ -24,7 +24,7 @@ const App = () => {
     <div>
       <Routes>
         <Route path = '/' element = {<Home />} />
-        {/* Legacy/shortcut routes to keep old links working */}
+        
         <Route path='/friends' element={<Navigate to='/dashboard/friends' replace />} />
         <Route path='/friends/friend' element={<Navigate to='/dashboard/friends/friend' replace />} />
     <Route path = '/dashboard' element = {<ProtectedRoute><Dashboard /></ProtectedRoute>}>
