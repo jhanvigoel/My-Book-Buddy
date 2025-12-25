@@ -84,13 +84,15 @@ const Profile = () => {
 
       try{
 
-        const data = await axiosPrivate.get('/dashboard/profile/upload-photo');
+        const response = await axiosPrivate.get('/dashboard/profile/upload-photo');
 
-        if (!data.photoUrl){
+        console.log('Fetch photo response:', response.data);
+
+        if (!response.data.photoUrl){
           return;
         }
 
-        setProfilePhoto(data.photoUrl);
+        setProfilePhoto(response.data.photoUrl);
 
         
       }
