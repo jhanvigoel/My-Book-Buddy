@@ -62,13 +62,18 @@ const Profile = () => {
 
       const data = await res.json();
 
-      await axiosPrivate.post('/dashboard/profile/upload-photo',{photoUrl : data.secure_url});
+      const saveResponse = await axiosPrivate.post('/dashboard/profile/upload-photo',{photoUrl : data.secure_url});
+      
+      console.log('Save response:', saveResponse);
 
       setProfilePhoto(data.secure_url);
 
+      alert('Photo uploaded successfully!');
+
     } catch(err){
       console.error('upload failed',err);
-      alert('Upload failed');
+      console.error('Error response:', err.response?.data);
+      alert(`Upload failed: ${err.response?.data?.error || err.message}`);
     }
     
   };
